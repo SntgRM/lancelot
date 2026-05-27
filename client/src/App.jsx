@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AlertProvider } from "./context/AlertContext";
+import Alert from "./components/alerts/Alert";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -6,29 +8,31 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 function App() {
 
   return (
-    <BrowserRouter>
+    <AlertProvider>
+      <BrowserRouter>
+        <Alert />
+        <Routes>
 
-      <Routes>
+          <Route
+            path="/"
+            element={<LoginPage />}
+          />
 
-        <Route
-          path="/"
-          element={<LoginPage />}
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
+                <DashboardPage />
 
-              <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
 
-            </ProtectedRoute>
-          }
-        />
+        </Routes>
 
-      </Routes>
-
-    </BrowserRouter>
+      </BrowserRouter>
+    </AlertProvider>
   );
 }
 
