@@ -1,34 +1,30 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useAlert } from "../../context/AlertContext";
 
-function EditTaskModal({
-    task,
-    onClose,
-    onTaskUpdated,
-}) {
+function EditTaskModal({ task, onClose, onTaskUpdated }) {
 
+    const { showAlert } = useAlert();
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         priority: "medium",
-        status: "pending",
     });
+    const [titleError, setTitleError] = useState("");
 
     useEffect(() => {
-
         if (!task) return;
-
         setFormData({
             title: task.title,
             description: task.description,
             priority: task.priority,
-            status: task.status,
         });
-
+        setTitleError("");
     }, [task]);
 
     const handleChange = (e) => {
-
+        if (e.target.name === "title") {
+            setTitleError("");
+        }
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
@@ -36,28 +32,24 @@ function EditTaskModal({
     };
 
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
         if (!formData.title.trim()) {
-            toast.error("Title is required");
+            setTitleError("El titulo es obligatorio");
             return;
         }
 
         const token = localStorage.getItem("token");
 
         try {
-
             const response = await fetch(
                 `http://127.0.0.1:8000/api/tasks/${task.id}/`,
                 {
                     method: "PUT",
-
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-
                     body: JSON.stringify({
                         ...task,
                         ...formData,
@@ -70,108 +62,151 @@ function EditTaskModal({
             }
 
             const updatedTask = await response.json();
-
             onTaskUpdated(updatedTask);
-
-            toast.success("Task updated");
-
+            showAlert("Tarea actualizada", "success");
             onClose();
 
         } catch (error) {
-
             console.log(error);
-
-            toast.error("Something went wrong");
+            showAlert("Algo salio mal", "error");
         }
     };
 
+    const priorityOptions = [
+        {
+            value: "high",
+            label: "Alta",
+            activeClasses: "border-red-500/50 bg-red-500/10 text-red-400",
+            dotClass: "bg-red-400",
+        },
+        {
+            value: "medium",
+            label: "Media",
+            activeClasses: "border-orange-500/50 bg-orange-500/10 text-orange-400",
+            dotClass: "bg-orange-400",
+        },
+        {
+            value: "low",
+            label: "Baja",
+            activeClasses: "border-green-500/50 bg-green-500/10 text-green-400",
+            dotClass: "bg-green-400",
+        },
+    ];
+
+    if (!task) return null;
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="w-full max-w-lg rounded-xl bg-white p-8 shadow-xl">
+            <div className="relative w-full max-w-md animate-in fade-in zoom-in-95 duration-200 rounded-xl border border-border bg-surface shadow-2xl shadow-black/40">
 
-                <div className="mb-6 flex items-center justify-between">
-
-                    <h2 className="text-3xl font-bold">
-                        Edit Task
-                    </h2>
-
+                <div className="flex items-center justify-between border-b border-border px-6 py-4">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-muted">
+                            <svg className="h-4 w-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-base font-semibold text-foreground">Editar Tarea</h2>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="text-xl transition hover:opacity-70"
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
                     >
-                        ✕
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
-
                 </div>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4"
-                >
+                <form onSubmit={handleSubmit} className="space-y-4 p-6">
 
-                    <input
-                        type="text"
-                        name="title"
-                        placeholder="Task title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        className="w-full rounded border p-3"
-                    />
+                    <div>
+                        <label htmlFor="edit-title" className="mb-1.5 block text-sm font-medium text-foreground">
+                            Título
+                        </label>
+                        <input
+                            id="edit-title"
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            className={`input-field w-full rounded-lg border px-4 py-3 text-foreground placeholder-muted outline-none ${
+                                titleError 
+                                    ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                                    : 'border-border bg-surface-elevated focus:border-accent'
+                            }`}
+                        />
+                        {titleError && (
+                            <p className="mt-1.5 flex items-center gap-1.5 text-sm text-red-400 animate-in fade-in slide-in-from-top-1 duration-200">
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {titleError}
+                            </p>
+                        )}
+                    </div>
 
-                    <textarea
-                        name="description"
-                        placeholder="Task description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        className="min-h-30 w-full rounded border p-3"
-                    />
+                    <div>
+                        <label htmlFor="edit-description" className="mb-1.5 block text-sm font-medium text-foreground">
+                            Descripción
+                            <span className="ml-1 font-normal text-muted">(opcional)</span>
+                        </label>
+                        <textarea
+                            id="edit-description"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            rows={3}
+                            className="input-field w-full resize-none rounded-lg border border-border bg-surface-elevated px-4 py-3 text-foreground placeholder-muted outline-none focus:border-accent"
+                        />
+                    </div>
 
-                    <select
-                        name="priority"
-                        value={formData.priority}
-                        onChange={handleChange}
-                        className="w-full rounded border p-3"
-                    >
-                        <option value="high">
-                            High
-                        </option>
+                    <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">
+                            Prioridad
+                        </label>
+                        <div className="flex gap-2">
+                            {priorityOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, priority: option.value }))}
+                                    className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all ${
+                                        formData.priority === option.value
+                                            ? option.activeClasses
+                                            : "border-border bg-surface-elevated text-muted hover:border-border-hover hover:text-foreground"
+                                    }`}
+                                >
+                                    <span className={`h-2 w-2 rounded-full ${formData.priority === option.value ? option.dotClass : "bg-muted"}`} />
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
-                        <option value="medium">
-                            Medium
-                        </option>
-
-                        <option value="low">
-                            Low
-                        </option>
-                    </select>
-
-                    <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        className="w-full rounded border p-3"
-                    >
-                        <option value="pending">
-                            Pending
-                        </option>
-
-                        <option value="completed">
-                            Completed
-                        </option>
-                    </select>
-
-                    <button
-                        type="submit"
-                        className="w-full rounded-lg bg-black py-3 text-white transition hover:opacity-90"
-                    >
-                        Save Changes
-                    </button>
+                    <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="cursor-pointer rounded-lg px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:text-foreground"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            className="btn-primary cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white"
+                        >
+                            Guardar Cambios
+                        </button>
+                    </div>
 
                 </form>
-
             </div>
-
         </div>
     );
 }
