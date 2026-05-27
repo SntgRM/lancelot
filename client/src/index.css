@@ -64,3 +64,66 @@
 .zoom-in-95 {
   --tw-enter-scale: 0.95;
 }
+
+@keyframes alert-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes icon-pop {
+  0%   { opacity: 0; transform: scale(0.5); }
+  50%  { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.alert-enter {
+  animation: alert-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.alert-exit {
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  transition: all 0.3s ease-out;
+}
+
+.alert-icon-pop {
+  animation: icon-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.alert-check-draw {
+  stroke-dasharray: 100;
+  animation: check-draw 0.4s ease-out 0.2s both;
+}
+
+.alert-success-border {
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.alert-error-border {
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-progress-success {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.alert-progress-error {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
