@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAlert } from "../../context/AlertContext";
+import { updateTask } from "../../services/taskService";
 
 function EditTaskModal({ task, onClose, onTaskUpdated }) {
 
@@ -39,33 +40,11 @@ function EditTaskModal({ task, onClose, onTaskUpdated }) {
             return;
         }
 
-        const token = localStorage.getItem("token");
-
         try {
-            const response = await fetch(
-                `http://127.0.0.1:8000/api/tasks/${task.id}/`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        ...task,
-                        ...formData,
-                    }),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to update task");
-            }
-
-            const updatedTask = await response.json();
+            const updatedTask = await updateTask(task.id, { ...task, ...formData });
             onTaskUpdated(updatedTask);
             showAlert("Tarea actualizada", "success");
             onClose();
-
         } catch (error) {
             console.log(error);
             showAlert("Algo salio mal", "error");
