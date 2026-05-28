@@ -33,8 +33,8 @@ Aplicación fullstack de gestión de tareas personales. Cada usuario autenticado
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
-cd <nombre-del-repositorio>
+git clone https://github.com/SntgRM/lancelot
+cd lancelot
 ```
 
 ### 2. Verificaciones importantes antes de levantar
@@ -64,11 +64,17 @@ Este comando:
 
 ### 4. Acceder a la aplicación
 
-| Servicio | URL |
-|---|---|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:8000/api |
-| Admin Django | http://localhost:8000/admin |
+Una vez que todos los contenedores estén corriendo, **la aplicación se visualiza y se prueba desde el frontend:**
+
+> ### 👉 http://localhost:5173
+
+Ahí encontrarás el login, el dashboard y toda la funcionalidad de la app.
+
+Los otros servicios son de soporte:
+
+| Servicio | URL | Uso |
+|---|---|---|
+| Backend API | http://localhost:8000/api | Consumido internamente por el frontend |
 
 ### Credenciales de prueba
 
