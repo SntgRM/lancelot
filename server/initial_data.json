@@ -1,0 +1,86 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$WvsQOQccxa2SCxdDmS84os$OsxA6EYv24jzCMSvkVJrO21/n9urQpji6QSXKf4BDek=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "usuario1",
+      "first_name": "",
+      "last_name": "",
+      "email": "usuario1@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-27T17:57:08Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$WvsQOQccxa2SCxdDmS84os$OsxA6EYv24jzCMSvkVJrO21/n9urQpji6QSXKf4BDek=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "usuario2",
+      "first_name": "",
+      "last_name": "",
+      "email": "usuario2@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-27T17:57:08Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "title": "Revisar correos pendientes",
+      "description": "Revisar y responder los correos de trabajo acumulados durante la semana.",
+      "status": "pending",
+      "priority": "high",
+      "created_at": "2026-05-27T17:57:08Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "title": "Comprar mercado",
+      "description": "Leche, huevos, pan, frutas y verduras para la semana",
+      "status": "completed",
+      "priority": "low",
+      "created_at": "2026-05-27T17:57:08Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 3,
+    "fields": {
+      "user": 2,
+      "title": "Preparar presentación",
+      "description": "Preparar las diapositivas para la reunión del lunes con el equipo.",
+      "status": "pending",
+      "priority": "high",
+      "created_at": "2026-05-27T17:57:08Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 4,
+    "fields": {
+      "user": 2,
+      "title": "Llamar al médico",
+      "description": "Solicitar cita para chequeo médico anual.",
+      "status": "pending",
+      "priority": "medium",
+      "created_at": "2026-05-27T17:57:08Z"
+    }
+  }
+]
