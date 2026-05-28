@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAlert } from "../../context/AlertContext";
+import { createTask } from "../../services/taskService";
 
 function TaskForm({ onTaskCreated }) {
 
@@ -23,7 +24,6 @@ function TaskForm({ onTaskCreated }) {
     };
 
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
         if (!formData.title.trim()) {
@@ -31,47 +31,15 @@ function TaskForm({ onTaskCreated }) {
             return;
         }
 
-        const token = localStorage.getItem("token");
-
         try {
-
-            const response = await fetch(
-                "http://127.0.0.1:8000/api/tasks/",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-
-                    body: JSON.stringify(formData),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to create task");
-            }
-
-            const data = await response.json();
-
+            const data = await createTask(formData);
             onTaskCreated(data);
-
             showAlert("Tarea creada", "success");
-
-            setFormData({
-                title: "",
-                description: "",
-                priority: "medium",
-            });
-
+            setFormData({ title: "", description: "", priority: "medium" });
             setIsExpanded(false);
             setTitleError("");
-
         } catch (error) {
-
             console.log(error);
-
             showAlert("Algo salio mal", "error");
         }
     };
