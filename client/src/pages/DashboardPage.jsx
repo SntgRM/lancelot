@@ -6,6 +6,7 @@ import TaskForm from "../components/tasks/TaskForm";
 import TaskCard from "../components/tasks/TaskCard";
 import EditTaskModal from "../components/tasks/EditTaskModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
+import { getTasks, deleteTask, updateTask } from "../services/taskService";
 
 function DashboardPage() {
 
@@ -24,40 +25,17 @@ function DashboardPage() {
     const [taskToDelete, setTaskToDelete] = useState(null);
 
     const fetchTasks = async () => {
-
-        const token = localStorage.getItem("token");
-
         try {
-
-            const response = await fetch(
-                "http://127.0.0.1:8000/api/tasks/",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch tasks");
-            }
-
-            const data = await response.json();
-
+            const data = await getTasks();
             setTasks(data);
-
         } catch (error) {
-
             console.log(error);
-
             showAlert("Error al cargar las tareas", "error");
         }
     };
 
     useEffect(() => {
-
         fetchTasks();
-
     }, []);
 
     const handleLogout = () => {
@@ -70,20 +48,15 @@ function DashboardPage() {
     };
 
     const handleTaskCreated = (task) => {
-
         setTasks((prev) => [task, ...prev]);
     };
 
     const handleTaskUpdated = (updatedTask) => {
-
         setTasks((prev) =>
             prev.map((task) =>
-                task.id === updatedTask.id
-                    ? updatedTask
-                    : task
+                task.id === updatedTask.id ? updatedTask : task
             )
         );
-
         setSelectedTask(null);
     };
 
@@ -95,29 +68,10 @@ function DashboardPage() {
     const confirmDeleteTask = async () => {
         if (!taskToDelete) return;
 
-        const token = localStorage.getItem("token");
-
         try {
-            const response = await fetch(
-                `http://127.0.0.1:8000/api/tasks/${taskToDelete}/`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to delete task");
-            }
-
-            setTasks((prev) =>
-                prev.filter((task) => task.id !== taskToDelete)
-            );
-
+            await deleteTask(taskToDelete);
+            setTasks((prev) => prev.filter((task) => task.id !== taskToDelete));
             showAlert("Tarea eliminada", "success");
-
         } catch (error) {
             console.log(error);
             showAlert("Error al eliminar la tarea", "error");
@@ -127,59 +81,26 @@ function DashboardPage() {
     };
 
     const handleToggleComplete = async (task) => {
-
-        const token = localStorage.getItem("token");
         const newStatus = task.status === "completed" ? "pending" : "completed";
 
         try {
-
-            const response = await fetch(
-                `http://127.0.0.1:8000/api/tasks/${task.id}/`,
-                {
-                    method: "PUT",
-
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-
-                    body: JSON.stringify({
-                        ...task,
-                        status: newStatus,
-                    }),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to update task");
-            }
-
-            const updatedTask = await response.json();
-
+            const updatedTask = await updateTask(task.id, {
+                ...task,
+                status: newStatus,
+            });
             setTasks((prev) =>
-                prev.map((item) =>
-                    item.id === updatedTask.id
-                        ? updatedTask
-                        : item
-                )
+                prev.map((item) => (item.id === updatedTask.id ? updatedTask : item))
             );
-
         } catch (error) {
-
             console.log(error);
-
             showAlert("Error al actualizar la tarea", "error");
         }
     };
 
     const filteredTasks = tasks
         .filter((task) => {
-            if (filter !== "all" && task.status !== filter) {
-                return false;
-            }
-            if (priorityFilter !== "all" && task.priority !== priorityFilter) {
-                return false;
-            }
+            if (filter !== "all" && task.status !== filter) return false;
+            if (priorityFilter !== "all" && task.priority !== priorityFilter) return false;
             if (searchText.trim() !== "") {
                 const search = searchText.toLowerCase();
                 return task.title.toLowerCase().includes(search);
@@ -411,7 +332,6 @@ function DashboardPage() {
                     ) : (
 
                         filteredTasks.map((task) => (
-
                             <TaskCard
                                 key={task.id}
                                 task={task}
@@ -419,7 +339,6 @@ function DashboardPage() {
                                 onToggleComplete={handleToggleComplete}
                                 onEdit={setSelectedTask}
                             />
-
                         ))
 
                     )}
